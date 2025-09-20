@@ -1,2 +1,2 @@
 # My-C-projects
-too tired/exhausted to upload on this repo lol
+too sleepy to upload on this repo lol
