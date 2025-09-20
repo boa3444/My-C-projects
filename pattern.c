@@ -2,51 +2,34 @@
 
 
 int main(){
+	int deadend = 7;
 	
-	int flag = 1;
-	
-	for(int count = 7; count>0; count--){
-		int s = 6;
-		int i = 1;
-		flag = 1;
-		
-	
-			
-		for (; i<8 && flag == 1; ){
-			
-			if ( i > count){
+	for ( int line = 1 ; line <= 7 ; line++)
+	{
+		for ( int number = 1 ; number <=7 ; number++)
+		{
+			if ( number > deadend )
 				printf(" ");
-				}
-			else if ( i <= count)
-			{
-				printf("%d", i);
-			}
-			
-			i++;
-			
-			
-			if (i ==8){
-				//printf("\n");
-				for (; s>0; s--){
-					if (s > count){
-						printf(" ");
-						}
-					else
-					printf("%d", s);
-					if ( s==1){
-						printf("\n");
-						flag = 0;
-						i=1;
-						break;
-						}
-					}
-
-				}
+			else
+				printf("%d" , number);
 				
+			if ( number == 7 )
+			{
+				for ( int rebmun = 6 ; rebmun > 0 ; rebmun--)
+				
+					{
+						if ( rebmun > deadend)
+							printf(" ");
+						else
+							printf("%d" , rebmun);
+					}
 			}
 			
 		}
 		
-					
-		return 0;
-		}
+		printf("\n");
+		deadend--;
+	}
+	return 0 ;
+	}
+				

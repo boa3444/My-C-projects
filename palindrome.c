@@ -24,17 +24,13 @@ int main(){
 	
 		if (is_palin(num))
 		{
-			if (i == input)
-			{
-				printf("%d\n", num);
-			}
-				
+			printf("%d\n" , num);
+	
 			i += 1;
-			
 			
 		}
 	}
-		return 0;
+	return 0;
 		
 	}
 		

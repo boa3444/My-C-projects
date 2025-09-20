@@ -1,11 +1,11 @@
 #include<stdio.h>
-int main()
-float p = 100000.0;
-int n;
-for(n=1;n<=10;n++){
-p = p * (1+(10.0/100));
+int main(){
+	int initial = 100000;
+	for ( int i = 1 ; i <=10 ; i++)
+	{
+		initial += (initial / 10);
+		printf("At the end of %d year: %d\n", i , initial);
+	}
 
-printf("%d\t%f\n", n, p);
-}
-return 0;
+	return 0;
 }
