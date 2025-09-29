@@ -27,10 +27,10 @@ void maximum(int arr[], int size)
 int main(){
 	
 	int element, *arr;
-	printf("Type 10 elements and press enter after each element:");
+	printf("Type 10 elements and press space after each element:");
 	for ( int n = 0 ; n< MAX;n++)
 	{
-		scanf(" %d\n" , &arr[n]);
+		scanf(" %d" , &arr[n]);
 	}
 	
 	maximum(arr, MAX);
