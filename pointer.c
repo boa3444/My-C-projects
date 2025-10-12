@@ -1,16 +1,17 @@
 #include <stdio.h>
 int k;
-int * func();
+int inc();
 int main()
 {
-	int *y ;
-	y = func() ;
-	printf("%d " , *(func()));
+	inc();
+	inc();
+	inc();
 	return 0 ;
 }
 
-int * func ()
+int inc()
 {
-	k = 9 ;
-	return ( &k);
+	auto int k = 9 ;
+	printf("%d" , k);
+	k++;
 }
