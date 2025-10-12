@@ -1,15 +1,21 @@
 #include <stdio.h>
 
-int factorial(int,int);
-int main(){
-	printf("%d" ,factorial(5, 1));
+int fact(int);
+int main()
+{
+	int numb;
+	scanf("%d" , &numb);
+	int f =fact(numb);
+	printf("%d" , f);
 	return 0 ;
-	}
-	
-int factorial(int number, int ans){
-	if ( number == 1 ) 
-		return ans;
-	
-	ans *= number;
-	factorial( number -1, ans);
 }
+
+int fact(int numb)
+{
+	if ( numb == 1)
+		return 1;
+	else
+		return ( numb * fact(numb -1));
+	
+}
+
