@@ -1,17 +1,15 @@
 #include <stdio.h>
-#include <string.h>
-
-struct database{
-	char name[10];
-	int age;
-	long long adhar;
-};
 
 int main()
 {
-	struct database d= {.age=20,.adhar=2282929392838};
-	strcpy(d.name, "Divyanshi");
-	printf("Age: %d, Adhar: %lld, Name: %s\n" , d.age, d.adhar, d.name);
+	struct Details
+	{
+		int age;
+		char name[50];
+		char add[50];
+	};
+	struct Details d;
 
-	return 0 ;
+	printf("%p , %p, %p", &d.age, d.name,d.add);
+	return 0;
 }
