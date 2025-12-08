@@ -232,7 +232,7 @@ int main()
 		{
 			for ( int r=0;r<4;r++)
 			{
-				state_matrix[r][c] = padded_input[i];
+				state_matrix[r][c] = padded_input[times * 16 + i];
 				i++;
 			}
 		}			
@@ -260,31 +260,22 @@ int main()
 		AddRoundKey(state_matrix, key_schedule[10]);
 		
 		//store the first ciphertxt in a block
-		i=0;
 		uint8_t cipher_block[4][4];
-		for (int c = 0; c < 4; c++)
-		{
-		    for (int r = 0; r < 4; r++) 
-		    {
-			cipher[16 + times*16 + i] = cipher_block[r][c];
-			pehle_wala[i] = cipher_block[r][c]; // chain for next block
+		i = 0;
+		for (int c = 0; c < 4; c++) {
+		    for (int r = 0; r < 4; r++) {
+			uint8_t byte = state_matrix[r][c];
+			cipher[16 + times*16 + i] = byte;  // store after IV (first 16 bytes)
+			pehle_wala[i] = byte;              // chain for next block
 			i++;
 		    }
 		}
 
-		i=0;
-		for ( int c= 0;c<4;c++)
-		{
-			for ( int r=0;r<4;r++)
-			{	
-				cipher[i]=cipher_block[r][c] ;
-				i++;
-			}
-		}
 	}
 	
 	printf("Encrypted part (ciphertext):\n");
 	print_cipher(cipher, len_input);
+	
 	//DECIPHER()
 	// len_input is the padded plaintext length used during encryption.
 	// cipher has IV (16 bytes) + ciphertext (len_input bytes).
