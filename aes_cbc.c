@@ -101,6 +101,16 @@ void g(uint8_t word[4],int round);
 void KeyExpansion(uint8_t key_matrix[4][4]);//no of round in int
 void AddRoundKey(uint8_t state_matrix[4][4], uint8_t roundkey[16]);
 
+
+void print_cipher(const uint8_t *data, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        printf("%02X ", data[i]);  
+    }
+    printf("\n");
+}
+
+
+
 void InvSubBytes(uint8_t state_matrix[4][4]);
 void InvShiftRows(uint8_t state_matrix[4][4]);
 uint8_t InvGf_mult( uint8_t , uint8_t);
@@ -273,7 +283,8 @@ int main()
 		}
 	}
 	
-	
+	printf("Encrypted part (ciphertext):\n");
+	print_cipher(cipher, len_input);
 	//DECIPHER()
 	// len_input is the padded plaintext length used during encryption.
 	// cipher has IV (16 bytes) + ciphertext (len_input bytes).
@@ -289,7 +300,7 @@ int main()
 
 	// prev_block starts as IV
 	uint8_t prev_block[16];
-	memcpy(prev_block, cipher, 16); // IV at cipher[0..15]
+	memcpy(prev_block, cipher, 16); // IV at cipher 0..15
 
 	// Process each ciphertext block C[b]
 	for (int b = 0; b < blocks; b++) {
