@@ -272,33 +272,10 @@ int main()
 		}
 	}
 	
+	
 	//DECIPHER()
 
-	i=0;
-	uint8_t cipher_matrix[4][4];
-	for ( int c=0;c<4;c++)
-	{
-		for ( int r=0;r<4;r++)
-		{
-			cipher_matrix[r][c]= cipher[i];
-			i++;
-		}
-	}
-	
-	AddRoundKey(cipher_matrix, key_schedule[10]);
-	
-	for (int round = 9; round > 0; round--) 
-	{
-	    InvSubBytes(cipher_matrix);
-	    InvShiftRows(cipher_matrix);
-	    InvMixColumns(cipher_matrix);
-	    AddRoundKey(cipher_matrix, key_schedule[round]);
-	}
 
-	InvSubBytes(cipher_matrix);
-	InvShiftRows(cipher_matrix);
-	InvAddRoundKey(cipher_matrix, key_schedule[0]);
-	
 	
 	
 
@@ -362,27 +339,36 @@ void ShiftRows( uint8_t state_matrix[4][4])
 	};
 */
 
-uint8_t Gf_mult( uint8_t byte , uint8_t mult_with)
-{
-	if ( mult_with == 1)
-		return byte;
-	if ( mult_with == 2)
-	{
-		uint8_t temp = (byte << 1) & 0xff; // 0xff for masking the overflow of 8 bits
-		if ( (byte >> 7 ) == 1)
-		{
-			return temp ^ 0x1b;
-		}
-		else
-			return temp;
-	}
+uint8_t Gf_mult(uint8_t byte, uint8_t mult_with) {
+    uint8_t temp;
 
-	if ( mult_with == 3)
-	{
-		uint8_t temp = ( Gf_mult(byte, 2));
-		return (temp ^ byte);
-	}
-	return 0 ;
+    if (mult_with == 1) return byte;
+
+    if (mult_with == 2) {
+        temp = (byte << 1) & 0xFF;
+        if (byte & 0x80) temp ^= 0x1B; // reduce modulo x^8 + x^4 + x^3 + x + 1
+        return temp;
+    }
+
+    if (mult_with == 3) {
+        return Gf_mult(byte, 2) ^ byte;
+    }
+
+    // Inverse MixColumns multipliers
+    if (mult_with == 9) {        // 0x09 = x^3 + 1
+        return Gf_mult(Gf_mult(Gf_mult(byte, 2), 2), 2) ^ byte;
+    }
+    if (mult_with == 0x0B) {     // 0x0B = x^3 + x + 1
+        return Gf_mult(Gf_mult(Gf_mult(byte, 2), 2), 2) ^ Gf_mult(byte, 2) ^ byte;
+    }
+    if (mult_with == 0x0D) {     // 0x0D = x^3 + x^2 + 1
+        return Gf_mult(Gf_mult(Gf_mult(byte, 2), 2), 2) ^ Gf_mult(Gf_mult(byte, 2), 2) ^ byte;
+    }
+    if (mult_with == 0x0E) {     // 0x0E = x^3 + x^2 + x
+        return Gf_mult(Gf_mult(Gf_mult(byte, 2), 2), 2) ^ Gf_mult(Gf_mult(byte, 2), 2) ^ Gf_mult(byte, 2);
+    }
+
+    return 0; 
 }
 
 void MixColumns(uint8_t state_matrix[4][4])
