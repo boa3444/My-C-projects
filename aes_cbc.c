@@ -233,6 +233,7 @@ int main()
 			for ( int r=0;r<4;r++)
 			{
 				state_matrix[r][c] ^= pehle_wala[i];
+				i++;
 			}
 		}
 			
@@ -251,16 +252,16 @@ int main()
 		//store the first ciphertxt in a block
 		i=0;
 		uint8_t cipher_block[4][4];
-		for ( int c=0;c<4;c++)
+		for (int c = 0; c < 4; c++)
 		{
-			for ( int r=0;r<4;r++)
-			{
-				cipher_block[r][c]= state_matrix[r][c];
-				pehle_wala[i] = state_matrix[r][c];
-				i++;
-			}
+		    for (int r = 0; r < 4; r++) 
+		    {
+			cipher[16 + times*16 + i] = cipher_block[r][c];
+			pehle_wala[i] = cipher_block[r][c]; // chain for next block
+			i++;
+		    }
 		}
-		
+
 		i=0;
 		for ( int c= 0;c<4;c++)
 		{
@@ -274,10 +275,84 @@ int main()
 	
 	
 	//DECIPHER()
+	// len_input is the padded plaintext length used during encryption.
+	// cipher has IV (16 bytes) + ciphertext (len_input bytes).
+	int blocks = len_input / 16;
+	uint8_t cipher_matrix[4][4];
+	unsigned char *plaintext = malloc(len_input);
+	if (!plaintext) {
+	    fprintf(stderr, "malloc failed for plaintext\n");
+	    return 1;
+	}
 
+	int out_offset = 0;
 
-	
-	
+	// prev_block starts as IV
+	uint8_t prev_block[16];
+	memcpy(prev_block, cipher, 16); // IV at cipher[0..15]
+
+	// Process each ciphertext block C[b]
+	for (int b = 0; b < blocks; b++) {
+	    // Load C[b] into cipher_matrix (column-major order)
+	    int i = 0;
+	    for (int c = 0; c < 4; c++) {
+		for (int r = 0; r < 4; r++) {
+		    cipher_matrix[r][c] = (uint8_t)cipher[16 + b*16 + i];
+		    i++;
+		}
+	    }
+
+	    // AES-128 inverse rounds
+	    AddRoundKey(cipher_matrix, key_schedule[10]);
+	    for (int round = 9; round >= 1; round--) {
+		InvShiftRows(cipher_matrix);
+		InvSubBytes(cipher_matrix);
+		AddRoundKey(cipher_matrix, key_schedule[round]); // XOR is its own inverse
+		InvMixColumns(cipher_matrix);
+	    }
+	    InvShiftRows(cipher_matrix);
+	    InvSubBytes(cipher_matrix);
+	    AddRoundKey(cipher_matrix, key_schedule[0]);
+
+	    // CBC XOR with prev_block (IV for the first block, else previous ciphertext)
+	    i = 0;
+	    for (int c = 0; c < 4; c++) {
+		for (int r = 0; r < 4; r++) {
+		    plaintext[out_offset + i] = cipher_matrix[r][c] ^ prev_block[i];
+		    i++;
+		}
+	    }
+
+	    // Update prev_block to current ciphertext C[b]
+	    memcpy(prev_block, cipher + 16 + b*16, 16);
+	    out_offset += 16;
+	}
+
+	// Remove PKCS#7 padding
+	int pad_len = plaintext[out_offset - 1];
+	if (pad_len <= 0 || pad_len > 16) {
+	    fprintf(stderr, "Invalid PKCS#7 padding length: %d\n", pad_len);
+	    // You can return or continue depending on your desired behavior.
+	} else {
+	    // Optional: verify all padding bytes
+	    int bad = 0;
+	    for (int k = 0; k < pad_len; k++) {
+		if (plaintext[out_offset - 1 - k] != pad_len) { bad = 1; break; }
+	    }
+	    if (bad) {
+		fprintf(stderr, "Invalid PKCS#7 padding bytes\n");
+	    } else {
+		out_offset -= pad_len;
+	    }
+	}
+
+	//THE RESULTTTT
+	printf("Decrypted: ");
+	fwrite(plaintext, 1, out_offset, stdout);
+	printf("\n");
+
+		
+		
 
 	return 0 ;
 
