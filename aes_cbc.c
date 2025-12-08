@@ -102,13 +102,14 @@ void KeyExpansion(uint8_t key_matrix[4][4]);//no of round in int
 void AddRoundKey(uint8_t state_matrix[4][4], uint8_t roundkey[16]);
 
 
-void print_cipher(const uint8_t *data, size_t len) {
-    for (size_t i = 0; i < len; i++) {
+void print_cipher(uint8_t *data, int len) 
+{
+    for (int i = 0; i < len; i++) 
+    {
         printf("%02X ", data[i]);  
     }
     printf("\n");
 }
-
 
 
 void InvSubBytes(uint8_t state_matrix[4][4]);
@@ -226,7 +227,7 @@ int main()
 	}
 		
 	for ( int times=0;times<len_input /16;times++)
-	{			
+	{
 		i=0;
 		for ( int c=0;c<4;c++)
 		{
@@ -282,9 +283,10 @@ int main()
 	int blocks = len_input / 16;
 	uint8_t cipher_matrix[4][4];
 	unsigned char *plaintext = malloc(len_input);
-	if (!plaintext) {
-	    fprintf(stderr, "malloc failed for plaintext\n");
-	    return 1;
+	if (!plaintext) 
+	{
+		fprintf(stderr, "malloc failed for plaintext\n");
+		return 1;
 	}
 
 	int out_offset = 0;
@@ -294,11 +296,14 @@ int main()
 	memcpy(prev_block, cipher, 16); // IV at cipher 0..15
 
 	// Process each ciphertext block C[b]
-	for (int b = 0; b < blocks; b++) {
+	for (int b = 0; b < blocks; b++) 
+	{
 	    // Load C[b] into cipher_matrix (column-major order)
 	    int i = 0;
-	    for (int c = 0; c < 4; c++) {
-		for (int r = 0; r < 4; r++) {
+	    for (int c = 0; c < 4; c++) 
+	    {
+		for (int r = 0; r < 4; r++) 
+		{
 		    cipher_matrix[r][c] = (uint8_t)cipher[16 + b*16 + i];
 		    i++;
 		}
@@ -306,7 +311,8 @@ int main()
 
 	    // AES-128 inverse rounds
 	    AddRoundKey(cipher_matrix, key_schedule[10]);
-	    for (int round = 9; round >= 1; round--) {
+	    for (int round = 9; round >= 1; round--) 
+	    {
 		InvShiftRows(cipher_matrix);
 		InvSubBytes(cipher_matrix);
 		AddRoundKey(cipher_matrix, key_schedule[round]); // XOR is its own inverse
@@ -318,8 +324,10 @@ int main()
 
 	    // CBC XOR with prev_block (IV for the first block, else previous ciphertext)
 	    i = 0;
-	    for (int c = 0; c < 4; c++) {
-		for (int r = 0; r < 4; r++) {
+	    for (int c = 0; c < 4; c++) 
+	    {
+		for (int r = 0; r < 4; r++) 
+		{
 		    plaintext[out_offset + i] = cipher_matrix[r][c] ^ prev_block[i];
 		    i++;
 		}
@@ -332,18 +340,25 @@ int main()
 
 	// Remove PKCS#7 padding
 	int pad_len = plaintext[out_offset - 1];
-	if (pad_len <= 0 || pad_len > 16) {
+	if (pad_len <= 0 || pad_len > 16) 
+	{
 	    fprintf(stderr, "Invalid PKCS#7 padding length: %d\n", pad_len);
-	    // You can return or continue depending on your desired behavior.
-	} else {
+		//wthhhhhh
+	} 
+	else 
+	{
 	    // Optional: verify all padding bytes
 	    int bad = 0;
-	    for (int k = 0; k < pad_len; k++) {
+	    for (int k = 0; k < pad_len; k++) 
+	    {
 		if (plaintext[out_offset - 1 - k] != pad_len) { bad = 1; break; }
 	    }
-	    if (bad) {
+	    if (bad) 
+	    {
 		fprintf(stderr, "Invalid PKCS#7 padding bytes\n");
-	    } else {
+	    } 
+	    else 
+	    {
 		out_offset -= pad_len;
 	    }
 	}
@@ -373,6 +388,7 @@ unsigned char *  pkcs_pad(char * array , int *len)
 		array[*len + i]=pad_len;
 	}
 	*len += pad_len;
+	
 	return array; //since here array is LOCAL and we used the realloc
 }
 
